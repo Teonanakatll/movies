@@ -271,7 +271,11 @@
                                         </div>
                                         <div class="item-info-product">
                                             <h4 class="">
-                                                <a href="../../../django_movie_template/moviesingle.html" class="editContent" >
+
+                                                <!-- Вызываем метод get_absolute_url модели movie -->
+
+                                                <a href=" {{ movie.get_absolute_url }} " class="editContent" >
+
                                                     {{ movie.title }}
                                                 </a>
                                             </h4>

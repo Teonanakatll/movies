@@ -1,6 +1,7 @@
 from datetime import date
 
 from django.db import models
+from django.urls import reverse
 
 
 class Category(models.Model):
@@ -82,6 +83,12 @@ class Movie(models.Model):
 
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        """ Будет возвращать метод реверс в который мы передаём имя url-адреса,
+         и в словаре передаём параметры которые необходимо передать в url (slug),
+         ключём будет 'slug': а значением данные поля url модели"""
+        return reverse("movie_detail", kwargs={"slug": self.url})
 
     class Meta:
         verbose_name = "Фильм"
