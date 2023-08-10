@@ -28,17 +28,22 @@ class AddReview(View):
     def post(self, request, pk):
         # В созданную форму передаём данные из post запроса
         form = ReviewForm(request.POST)
+        movie = Movie.objects.get(id=pk)
         if form.is_valid():
             # Так как отзыв мы привязываем к опред-ому фильму, необходимо указать к какому фильму будет привязан отзыв
 
             # Вызывая у формы метод save и передавая commit=False, приостанавливаем сохранение фармы
             form = form.save(commit=False)
+            # Если в пост запроссе есть ключь "parent", тоесть если отроботал скрипт ответа на коментарий и в поле
+            # "parent" подставлено значение
+            if request.POST.get("parent", None):
+                # Полю формы parent_id присваиваем числовое значение поля parent
+                form.parent_id = int(request.POST.get("parent"))
 
             # В поле movie_id передаём pk из запроса (ForeignKey), чтобы при сохранении формы
             # создать запись Reviews в бд и привязать её к фильму
             # form.movie_id = pk
 
-            movie = Movie.objects.get(id=pk)
             form.movie = movie
 
             form.save()
