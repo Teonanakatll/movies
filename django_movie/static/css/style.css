@@ -408,6 +408,10 @@ li > a:only-child:after {
     margin-top: 0;
     background-image: url('../single-post-pic.jpg');
 }
+.img-movie-shots {
+    max-height: 150px;
+    height: auto;
+}
 .ma
 /*-- place holder --*/
 

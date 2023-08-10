@@ -1,8 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView
 from django.views.generic.base import View
 
 from . models import Movie
+from . forms import ReviewForm
 
 
 class MoviesView(ListView):
@@ -20,3 +21,27 @@ class MovieDetailView(DetailView):
     slug_field = "url"
     # Шаблон неуказывается потому-что Джанго ищет шаблон по имени модели добавляя к нему "_detail"
     # Можно указать явно через template_name
+
+
+class AddReview(View):
+    """Отзывы"""
+    def post(self, request, pk):
+        # В созданную форму передаём данные из post запроса
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            # Так как отзыв мы привязываем к опред-ому фильму, необходимо указать к какому фильму будет привязан отзыв
+
+            # Вызывая у формы метод save и передавая commit=False, приостанавливаем сохранение фармы
+            form = form.save(commit=False)
+
+            # В поле movie_id передаём pk из запроса (ForeignKey), чтобы при сохранении формы
+            # создать запись Reviews в бд и привязать её к фильму
+            # form.movie_id = pk
+
+            movie = Movie.objects.get(id=pk)
+            form.movie = movie
+
+            form.save()
+
+        # Функция get_absolute_url() - вернёт шаблон movie_detail со слагом текущей модели movie
+        return redirect(movie.get_absolute_url())
