@@ -15,31 +15,38 @@ class CategoryAdmin(admin.ModelAdmin):
 # class ReviewsInline(admin.StackedInline):
 
 # Для отображения полей связанных коментариев в 1 строку (горизонтально)
-
-class MovieShotsInline(admin.TabularInline):
-    """ inline-форма добавления связанной (ForeignKey) записи в БД. """
-    model = MovieShots
-    # Кол-во inline-форм в админ-панели для модели.
-    extra = 0
-
-
 class ReviewsInline(admin.TabularInline):
     """Отзывы на странице фильма"""
     model = Reviews
     extra = 1
     readonly_fields = ("name", "email")
 
+class MovieShotsInline(admin.TabularInline):
+    """Выводит кадры из фильма в админке фильма"""
+    model = MovieShots
+    extra = 1
+    readonly_fields = ("get_html_photo",)
+
+    def get_html_photo(self, object):
+        if object.image:  # Если фото существует
+            # Функция mark_safe указывает не экранировать символы
+            return mark_safe(f"<img src='{object.image.url}' width=250")
+
+        # Меняем имя фото в админ панели
+
+    get_html_photo.short_description = "Кадр из фильма"
+
 
 @admin.register(Movie)
 class MovieAdmin(admin.ModelAdmin):
     """Фильмы"""
-    list_display = ("title", "category", "url", "draft")
+    list_display = ("title", "category", "url", "draft", "get_poster")
     list_filter = ("category", "year")
     # Указываем по какому полю в связанной модели производить поиск
     search_fields = ("title", "category__name")
     list_editable = ("draft",)
     # В списке указываем классы которые мы хотим прикрепить, работает со связями ManyToMany и ForeignKey.
-    inlines = [ReviewsInline, MovieShotsInline]
+    inlines = [MovieShotsInline, ReviewsInline]
     # Отобразить панель редактирования сверху
     save_on_top = True
     # Сохранить как новый обьект
@@ -50,14 +57,16 @@ class MovieAdmin(admin.ModelAdmin):
     # Автоматически заполняет поле slug при добавлении экземпляра класса
     prepopulated_fields = {'url': ('title',)}
 
+    readonly_fields = ("get_poster",)
+
 
     fieldsets = (
         (None, {
-            "fields": (("title", "tagline"), ),
+            "fields": (("title", "tagline"), )
 
         }),
         (None, {
-            "fields": (("description", "poster"), )
+            "fields": (("description", "poster", "get_poster"), ),
         }),
         (None, {
             "fields": (("year", "world_premiere", "country"), )
@@ -73,6 +82,12 @@ class MovieAdmin(admin.ModelAdmin):
             "fields": (("url", "draft"), )
         }),
     )
+
+    def get_poster(self, object):
+        if object.poster:
+            return mark_safe(f"<img src='{object.poster.url}' height=350")
+
+    get_poster.short_description = "Постер фильма"
 
 @admin.register(Reviews)
 class ReviewsAdmin(admin.ModelAdmin):
@@ -90,7 +105,14 @@ class GenreAdmin(admin.ModelAdmin):
 @admin.register(Actor)
 class ActorAdmin(admin.ModelAdmin):
     """Режиссёры и Актёры"""
-    list_display = ("name", "age")
+    list_display = ("name", "age", "get_actor_image")
+    readonly_fields = ("get_actor_image",)
+
+    def get_actor_image(self, object):
+        if object.image:
+            return mark_safe(f"<img src='{object.image.url}' width=250 ")
+
+    get_actor_image.short_description = "Фото актёра"
 
 
 @admin.register(Rating)
@@ -114,7 +136,11 @@ class MovieShots(admin.ModelAdmin):
             return mark_safe(f"<img src='{object.image.url}' width=250")
 
     # Меняем имя фото в админ панели
-    get_html_photo.short_description = "Миниатюра"
+    get_html_photo.short_description = "Кадр из фильма"
 
 
 admin.site.register(RatingStar)
+
+# Изменение названия админ панели и имени страницы
+admin.site.site_title = "Django Movies"
+admin.site.site_header = "Django Movies"
