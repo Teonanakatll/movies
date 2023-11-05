@@ -58,6 +58,10 @@ class MovieAdmin(admin.ModelAdmin):
     search_fields = ("title", "category__name")
     # Поле доступное для редактирования
     list_editable = ("draft",)
+
+    #Мои actions
+    actions = ["publish", "unpublish"]
+
     # Добавляем форму ckeditor
     form = MovieAdminForm
     # В списке указываем классы которые мы хотим прикрепить, работает со связями ManyToMany и ForeignKey.
@@ -104,6 +108,30 @@ class MovieAdmin(admin.ModelAdmin):
             return mark_safe(f"<img src='{object.poster.url}' height=350")
 
     get_poster.short_description = "Постер фильма"
+
+    def unpublish(self, request, queryset):
+        """Снять с публикации"""
+        row_update = queryset.update(draft=True)
+        if row_update == 1:
+            message_bit = "1 запись была обновлена"
+        else:
+            message_bit = f"{row_update} записи были обновлены"
+        self.message_user(request, f"{message_bit}")
+
+    def publish(self, request, queryset):
+        """Опубликовать"""
+        row_update = queryset.update(draft=True)
+        if row_update == 1:
+            message_bit = "1 запись была обновлена"
+        else:
+            message_bit = f"{row_update} записей было обновлено"
+        self.message_user(request, f"{message_bit}")
+
+    publish.short_description = "Опубликовать"
+    publish.allowed_permission = ('change',)
+
+    unpublish.short_description = "Снять с публикации"
+    unpublish.allowed_permission = ('change',)
 
 @admin.register(Reviews)
 class ReviewsAdmin(admin.ModelAdmin):
