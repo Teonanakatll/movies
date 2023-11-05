@@ -93,6 +93,8 @@ class Movie(models.Model):
         """ Будет возвращать метод реверс в который мы передаём имя url-адреса,
          и в словаре передаём параметры которые необходимо передать в url (slug),
          ключём будет 'slug': а значением данные поля url модели."""
+
+        # A первым параметром передаём имя url-адреса : "movie_detail".
         return reverse("movie_detail", kwargs={"slug": self.url})
 
     class Meta:

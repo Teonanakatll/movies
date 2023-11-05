@@ -1,8 +1,19 @@
+from django import forms
 from django.contrib import admin
 from django.utils.safestring import mark_safe
 
 from .models import Category, Genre, Movie, MovieShots, Actor, Rating, RatingStar, Reviews
 
+from ckeditor_uploader.widgets import CKEditorUploadingWidget
+
+
+
+class MovieAdminForm(forms.ModelForm):
+    # Добавляем виджет к полю класса
+    description = forms.CharField(label='Описание',widget=CKEditorUploadingWidget())
+    class Meta:
+        model = Movie
+        fields = '__all__'
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -25,16 +36,17 @@ class MovieShotsInline(admin.TabularInline):
     """Выводит кадры из фильма в админке фильма"""
     model = MovieShots
     extra = 1
-    readonly_fields = ("get_html_photo",)
+    readonly_fields = ("get_image",)
 
-    def get_html_photo(self, object):
+    def get_image(self, object):
         if object.image:  # Если фото существует
             # Функция mark_safe указывает не экранировать символы
             return mark_safe(f"<img src='{object.image.url}' width=250")
 
+
         # Меняем имя фото в админ панели
 
-    get_html_photo.short_description = "Кадр из фильма"
+    get_image.short_description = "Кадр из фильма"
 
 
 @admin.register(Movie)
@@ -44,7 +56,10 @@ class MovieAdmin(admin.ModelAdmin):
     list_filter = ("category", "year")
     # Указываем по какому полю в связанной модели производить поиск
     search_fields = ("title", "category__name")
+    # Поле доступное для редактирования
     list_editable = ("draft",)
+    # Добавляем форму ckeditor
+    form = MovieAdminForm
     # В списке указываем классы которые мы хотим прикрепить, работает со связями ManyToMany и ForeignKey.
     inlines = [MovieShotsInline, ReviewsInline]
     # Отобразить панель редактирования сверху
@@ -57,6 +72,7 @@ class MovieAdmin(admin.ModelAdmin):
     # Автоматически заполняет поле slug при добавлении экземпляра класса
     prepopulated_fields = {'url': ('title',)}
 
+    # Чтобы вывести изображение при просмотре записи
     readonly_fields = ("get_poster",)
 
 
@@ -106,6 +122,7 @@ class GenreAdmin(admin.ModelAdmin):
 class ActorAdmin(admin.ModelAdmin):
     """Режиссёры и Актёры"""
     list_display = ("name", "age", "get_actor_image")
+    # Чтобы вывести изображение при просмотре записи
     readonly_fields = ("get_actor_image",)
 
     def get_actor_image(self, object):
@@ -125,10 +142,11 @@ class RatingAdmin(admin.ModelAdmin):
 class MovieShots(admin.ModelAdmin):
     """Кадры из фильма"""
     list_display = ("title", "movie", "get_html_photo")
+    # Чтобы вывести изображение при просмотре записи
     readonly_fields = ("get_html_photo",)
 
     # Метод для отображения миниатюр в админ панели, возвращает html-код
-    # Параметр object ссылается на текущую запись списка (обьект модели Women)
+    # Параметр object ссылается на текущую запись списка (обьект модели Movie)
     # Обращаемся к полю photo и берем url
     def get_html_photo(self, object):
         if object.image:  # Если фото существует
