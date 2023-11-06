@@ -21,6 +21,9 @@ class CategoryAdmin(admin.ModelAdmin):
     list_display = ("id", "name", "url")
     list_display_links = ("name",)
 
+    # Автоматически заполняет поле slug при добавлении экземпляра класса
+    prepopulated_fields = {'url': ('name',)}
+
 
 # Класс для отображения в админке фильма связанных с ним коментариев
 # class ReviewsInline(admin.StackedInline):
@@ -54,6 +57,10 @@ class MovieAdmin(admin.ModelAdmin):
     """Фильмы"""
     list_display = ("title", "category", "url", "draft", "get_poster")
     list_filter = ("category", "year")
+
+    # Автоматически заполняет поле slug при добавлении экземпляра класса
+    prepopulated_fields = {'url': ('title',)}
+
     # Указываем по какому полю в связанной модели производить поиск
     search_fields = ("title", "category__name")
     # Поле доступное для редактирования
@@ -144,6 +151,9 @@ class ReviewsAdmin(admin.ModelAdmin):
 class GenreAdmin(admin.ModelAdmin):
     """Жанры"""
     list_display = ("name", "url")
+
+    # Автоматически заполняет поле slug при добавлении экземпляра класса
+    prepopulated_fields = {'url': ('name',)}
 
 
 @admin.register(Actor)
