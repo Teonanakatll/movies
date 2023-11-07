@@ -1,12 +1,23 @@
+from django.db.models import Q
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView
 from django.views.generic.base import View
 
-from .models import Movie, Category, Actor
+from .models import Movie, Category, Actor, Genre
 from . forms import ReviewForm
 
 
-class MoviesView(ListView):
+class GenreYears:
+    """ Жанры и года"""
+    def get_genres(self):
+        return Genre.objects.all()
+
+    def get_years(self):
+        # Функция values возвращает указанные словари, values_list кортежи
+        return Movie.objects.filter(draft=False).values("year")
+
+
+class MoviesView(GenreYears, ListView):
     """Список фильмов"""
     model = Movie
     queryset = Movie.objects.filter(draft=False)
@@ -23,7 +34,7 @@ class MoviesView(ListView):
     #     return context
 
 
-class MovieDetailView(DetailView):
+class MovieDetailView(GenreYears, DetailView):
     """Полное описание фильма"""
     model = Movie
     # Отвечает за поле по которому будет происходить поиск записи,
@@ -71,9 +82,19 @@ class AddReview(View):
         return redirect(movie.get_absolute_url())
 
 
-class ActorView(DetailView):
+class ActorView(GenreYears, DetailView):
     """ Вывод информации о актёре. """
     model = Actor
     template_name = "movies/actor.html"
     # Поле по которому мы будем искать актёров
     slug_field = "name"
+
+
+class FilterMoviesView(GenreYears, ListView):
+    """Фильтр фильмов"""
+    def get_queryset(self):
+        # getlist - выбрать все зночения атрибута
+        queryset = Movie.objects.filter(Q(year__in=self.request.GET.getlist("year")) |
+                                        Q(genres__in=self.request.GET.getlist("genre")))
+        return queryset
+
