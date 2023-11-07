@@ -11,7 +11,7 @@ def get_categories():
     return Category.objects.all()
 
 # inclusion_tag - может рендерить шаблоны переданные в него
-@register.inclusion_tag('tags/last_movies.html')
+@register.inclusion_tag('movies/tags/last_movies.html')
 # В переменной count передаём количество выводимых фильмов (по умолчанию 5)
 def get_last_movies(count=5):
     # Переменной movie присваиваем срез сортированный по id от начала до зночения переданного в count

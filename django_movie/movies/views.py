@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView
 from django.views.generic.base import View
 
-from .models import Movie, Category
+from .models import Movie, Category, Actor
 from . forms import ReviewForm
 
 
@@ -69,3 +69,11 @@ class AddReview(View):
 
         # Функция get_absolute_url() - вернёт шаблон movie_detail со слагом текущей модели movie
         return redirect(movie.get_absolute_url())
+
+
+class ActorView(DetailView):
+    """ Вывод информации о актёре. """
+    model = Actor
+    template_name = "movies/actor.html"
+    # Поле по которому мы будем искать актёров
+    slug_field = "name"

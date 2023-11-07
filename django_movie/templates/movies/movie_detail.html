@@ -38,14 +38,19 @@
             <li style="list-style: none">
                                     <span><b>Режиссер:</b>
                                         {% for director in movie.directors.all %}
-                                            {{ director.name }}
+                                        <!--  Добавляем ссылку (прописываем имя url адреса и slug для него.  -->
+<!--                                           <a href="{% url 'actor_detail' actor.name ">{{ director.name </a>-->
+                                          <a href="{{ director.get_absolute_url }}">{{ director.name }}</a>
                                         {% endfor %}
                                     </span>
             </li>
             <li style="list-style: none">
                                     <span><b>Актеры:</b>
                                         {% for actor in movie.actors.all %}
-                                            {{ actor.name }}
+
+                                            <!--  Добавляем ссылку (прописываем имя url адреса и slug для него.  -->
+<!--                                      <a href="{% url 'actor_detail' actor.name ">{{ actor.name </a>-->
+                                          <a href="{{ actor.get_absolute_url }}">{{ actor.name }}</a>
                                         {% endfor %}
                                     </span>
             </li>

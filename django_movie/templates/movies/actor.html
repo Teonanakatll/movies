@@ -1,0 +1,70 @@
+{% extends 'movies/base.html' %}
+{% load static %}
+{% block header %} bg2 {% endblock header %}
+{% block title %} {{ actor.name }} {% endblock title %}
+
+{% block container %}
+<div class="container py-md-3">
+  {% endblock container %}
+
+  {% block sidebar %}
+  <div class="side-bar col-lg-4">
+    {% endblock sidebar %}
+
+    {% block movie %}
+
+    <div class="left-ads-display col-lg-8">
+
+        <div class="desc1-left col-md-6">
+          <img src="{{ actor.image.url }}" class="img-fluid" alt="">
+        </div>
+        <div class="desc1-right col-md-6 pl-lg-4">
+          <h3 class="editContent" style="outline: none; cursor: inherit;">
+            {{ actor.name }}
+          </h3>
+          <h5 class="editContent"></h5>
+          <div>
+            <li style="list-style: none"><span><b>Возраст:</b>
+                                    {{ actor.age }}
+                                </span></li>
+
+            <li style="list-style: none">
+                                    <span><b>Режиссер:</b>
+                                      <!--  Чтобы узноть в каких фильмах был режиссёром используем
+                                        related_name модели Movie (film_director)-->
+                                        {% for movie in actor.film_director.all %}
+                                            {{ movie.title }}
+                                        {% endfor %}
+                                    </span>
+            </li>
+            <li style="list-style: none">
+                                    <span><b>Актер:</b>
+                                      <!--  Чтобы узноть в каких фильмах был актёром используем
+                                        related_name модели Movie (film_actor)-->
+                                        {% for movie in actor.film_actor.all %}
+                                            {{ movie.title }}
+                                        {% endfor %}
+                                    </span>
+            </li>
+
+
+          </div>
+        </div>
+        <div class="row sub-para-w3layouts mt-5">
+
+          <h3 class="shop-sing editContent" style="outline: none; cursor: inherit;">
+            О {{ actor.name }}</h3>
+
+          <p class="editContent" >
+          <!-- Тег safe служит для того чтобы теги добавленные через ckeditor выводились не как текст а
+                рендерелись вместе с шаблоном -->
+            {{ actor.description|safe }}
+          </p>
+
+        </div>
+
+
+    </div>
+    {% endblock movie %}
+  </div>
+</div>
